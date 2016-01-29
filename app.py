@@ -45,7 +45,9 @@ config = None
 @app.route('/solve', methods=['POST'])
 def solve():
     try:
-        response_data = convert.unicode2utf8(convert.value2json(noop.solve(flask.request.json)))
+        data = convert.json2value(convert.utf82unicode(flask.request.data))
+        solved = noop.solve(data)
+        response_data = convert.unicode2utf8(convert.value2json(solved))
 
         return Response(
             response_data,
@@ -58,7 +60,7 @@ def solve():
         )
     except Exception, e:
         e = Except.wrap(e)
-        Log.warning("Could not proces", cause=e)
+        Log.warning("Could not process", cause=e)
         e = e.as_dict()
         return Response(
             convert.unicode2utf8(convert.value2json(e)),
@@ -91,7 +93,7 @@ if __name__ == "__main__":
 
         app.run(**config.flask)
     except Exception, e:
-        Log.error("Serious problem with ActiveData service!  Shutdown completed!", cause=e)
+        Log.error("Serious problem with ChangeDetector service!  Shutdown completed!", cause=e)
     finally:
         Log.stop()
 

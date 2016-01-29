@@ -13,24 +13,17 @@ from __future__ import unicode_literals
 
 import requests
 
-from pyLibrary import jsons
+from pyLibrary import convert, jsons
 from pyLibrary.testing.fuzzytestcase import FuzzyTestCase
 
 
-settings = None
+settings = jsons.ref.get("file://tests/config/test_settings.json")
 
 
 class TestRequests(FuzzyTestCase):
     """
     TEST THAT THE SERVICE RESPONDS
     """
-
-    def __init__(self, *args, **kwargs):
-        FuzzyTestCase.__init__(self, *args, **kwargs)
-
-        global settings
-        if not settings:
-            settings = jsons.ref.get("file://tests/resources/config/client.json")
 
     def test_request(self):
         # SIMPLEST POSSIBLE REQUEST (NOTHING IMPORTANT HAPPENING)
@@ -60,7 +53,8 @@ class TestRequests(FuzzyTestCase):
 
         response = requests.post(settings.url, json=data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {})
+        data = convert.json2value(convert.utf82unicode(response.content))
+        self.assertEqual(data, {})
 
     def test_bad_request(self):
         # SIMPLEST POSSIBLE REQUEST (NOTHING IMPORTANT HAPPENING)
